@@ -15,11 +15,13 @@ export default async function ClockPage() {
     .eq('id', user.id)
     .single()
 
+  if (!profile?.driver_id) redirect('/driver/dashboard')
+
   const today = new Date().toISOString().split('T')[0]
   const { data: todayRecord } = await supabase
     .from('attendance')
     .select('*')
-    .eq('driver_id', profile!.driver_id)
+    .eq('driver_id', profile.driver_id)
     .eq('date', today)
     .maybeSingle()
 

@@ -12,7 +12,9 @@ export default async function PayslipPage() {
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase.from('profiles').select('driver_id').eq('id', user.id).single()
-  const driverId = profile!.driver_id
+  if (!profile?.driver_id) redirect('/driver/dashboard')
+
+  const driverId = profile.driver_id
 
   const [{ data: driver }, { data: payslips }] = await Promise.all([
     supabase.from('drivers').select('*').eq('id', driverId).single(),

@@ -31,12 +31,14 @@ export default async function ClaimsPage() {
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase.from('profiles').select('driver_id').eq('id', user.id).single()
+  if (!profile?.driver_id) redirect('/driver/dashboard')
+
   const { start } = { start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0] }
 
   const { data: claims } = await supabase
     .from('claims')
     .select('*')
-    .eq('driver_id', profile!.driver_id)
+    .eq('driver_id', profile.driver_id)
     .gte('date', start)
     .order('created_at', { ascending: false })
 

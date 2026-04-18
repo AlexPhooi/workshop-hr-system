@@ -19,7 +19,17 @@ export default async function DriverDashboard() {
     .eq('id', user.id)
     .single()
 
-  if (!profile?.driver_id) redirect('/login')
+  if (!profile?.driver_id) {
+    return (
+      <div className="p-4 pt-12 flex flex-col items-center text-center gap-3">
+        <p className="text-lg font-semibold text-slate-900">Account not linked yet</p>
+        <p className="text-sm text-slate-500 max-w-xs">
+          Your login works, but your manager hasn't added your driver profile yet.
+          Ask them to add you under <strong>Drivers → Add Driver</strong>.
+        </p>
+      </div>
+    )
+  }
 
   const driverId = profile.driver_id
   const today = new Date().toISOString().split('T')[0]

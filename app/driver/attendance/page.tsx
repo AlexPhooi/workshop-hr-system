@@ -13,10 +13,12 @@ export default async function AttendancePage() {
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase.from('profiles').select('driver_id').eq('id', user.id).single()
+  if (!profile?.driver_id) redirect('/driver/dashboard')
+
   const { start, end } = currentMonthRange()
 
   const [{ data: attendance }, { data: holidays }] = await Promise.all([
-    supabase.from('attendance').select('*').eq('driver_id', profile!.driver_id).gte('date', start).lte('date', end),
+    supabase.from('attendance').select('*').eq('driver_id', profile.driver_id).gte('date', start).lte('date', end),
     supabase.from('public_holidays').select('date').gte('date', start).lte('date', end),
   ])
 
