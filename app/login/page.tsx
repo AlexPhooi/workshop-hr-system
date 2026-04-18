@@ -20,23 +20,16 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
     if (signInError) {
       setError('Incorrect email or password.')
       setLoading(false)
       return
     }
 
-    // Fetch role using the session that was just set
-    const userId = data.user?.id
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single()
-
-    // Hard navigate so server-side components receive the auth cookies
-    window.location.replace(profile?.role === 'boss' ? '/boss/dashboard' : '/driver/dashboard')
+    // Hard navigate to root — middleware reads the auth cookie server-side
+    // and redirects to the correct dashboard based on role (boss/driver)
+    window.location.replace('/')
   }
 
   return (
