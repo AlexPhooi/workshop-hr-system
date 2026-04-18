@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +9,6 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Truck } from 'lucide-react'
 
 export default function LoginPage() {
-  const router = useRouter()
   const supabase = createClient()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -22,15 +20,23 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
     if (signInError) {
       setError('Incorrect email or password.')
       setLoading(false)
       return
     }
 
-    // Let the middleware handle role-based redirect — just refresh so it re-runs
-    router.refresh()
+    // Fetch role using the session that was just set
+    const userId = data.user?.id
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single()
+
+    // Hard navigate so server-side components receive the auth cookies
+    window.location.replace(profile?.role === 'boss' ? '/boss/dashboard' : '/driver/dashboard')
   }
 
   return (
