@@ -29,14 +29,7 @@ export default function LoginPage() {
       return
     }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user!.id)
-      .single()
-
-    router.push(profile?.role === 'boss' ? '/boss/dashboard' : '/driver/dashboard')
+    // Let the middleware handle role-based redirect — just refresh so it re-runs
     router.refresh()
   }
 
