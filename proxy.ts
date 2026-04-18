@@ -33,7 +33,13 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && path === '/login') {
-    const { data: profile } = await supabase
+    // Use service role key for profile lookup so RLS never blocks it
+    const serviceSupabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { cookies: { getAll: () => [], setAll: () => {} } }
+    )
+    const { data: profile } = await serviceSupabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
