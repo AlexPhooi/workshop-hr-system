@@ -3,7 +3,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { isNationalHoliday, isRestDay } from '@/lib/payroll/holidays'
 
 export async function POST(req: NextRequest) {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

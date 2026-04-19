@@ -33,7 +33,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && path === '/login') {
-    // Use service role key for profile lookup so RLS never blocks it
+    // Service role with empty cookies — PostgREST uses service key, not user JWT
     const serviceSupabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,

@@ -4,7 +4,7 @@ import { requireDriver, isAllowedReceiptType, isValidClaimType } from '@/lib/api
 import { ClaimType } from '@/lib/types'
 
 export async function POST(req: NextRequest) {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const auth = await requireDriver(supabase)
   if (auth instanceof NextResponse) return auth
 

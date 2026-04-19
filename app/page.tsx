@@ -1,27 +1,29 @@
 export const dynamic = 'force-dynamic'
 
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
 import { redirect } from 'next/navigation'
 
 export default async function RootPage() {
-  // Use regular client to verify the session
+  // Verify session with regular client (reads cookies for auth)
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  console.log('[root] user.id:', user?.id, 'user.email:', user?.email)
-
   if (!user) redirect('/login')
 
-  // Use service client to read role — bypasses RLS so it never returns null
-  const service = await createServiceClient()
-  const { data: profile, error: profileError } = await service
+  // Service role client with NO cookies — ensures PostgREST uses the
+  // service role key for auth (not the user JWT), bypassing RLS fully
+  const service = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { cookies: { getAll: () => [], setAll: () => {} } }
+  )
+
+  const { data: profile } = await service
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single()
-
-  console.log('[root] profile:', JSON.stringify(profile), 'error:', profileError?.message)
-  console.log('[root] service key set:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
 
   redirect(profile?.role === 'boss' ? '/boss/dashboard' : '/driver/dashboard')
 }

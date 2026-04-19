@@ -3,7 +3,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { requireBoss } from '@/lib/api-auth'
 
 export async function POST(req: NextRequest) {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const auth = await requireBoss(supabase)
   if (auth instanceof NextResponse) return auth
 

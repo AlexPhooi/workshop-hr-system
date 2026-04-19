@@ -5,7 +5,7 @@ import { requireBoss } from '@/lib/api-auth'
 import { Driver, Attendance, Claim } from '@/lib/types'
 
 export async function POST(req: NextRequest) {
-  const supabase = await createServiceClient()
+  const supabase = createServiceClient()
   const auth = await requireBoss(supabase)
   if (auth instanceof NextResponse) return auth
 
